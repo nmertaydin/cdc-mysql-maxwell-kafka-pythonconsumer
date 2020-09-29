@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+
+  mysql_max:
+    image: mysql:5.7.31
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - 13306:3306
+    volumes:
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/sqls:/docker-entrypoint-initdb.d
+    restart: always
+
+  maxwell:
+    image: zendesk/maxwell
+    command: bin/maxwell --user=maxwell --password=XXXXXX --host=mysql_max --producer=kafka --kafka.bootstrap.servers=kafka:9092 --kafka_topic=maxwell --output_ddl=true
+    depends_on:
+      - mysql_max
+      - zookeeper
+      - kafka
+    restart: always
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT 
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://:29092 
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on: 
+      - zookeeper
+
+  kafka-consumer-py:
+    image: 'python:3'
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./py:/home/
+    command: bash -c "pip install kafka-python && python /home/parse-engine.py"
+    depends_on:
+      - kafka
+    restart: always
