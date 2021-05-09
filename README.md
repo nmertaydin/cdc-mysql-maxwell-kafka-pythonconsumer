@@ -29,7 +29,7 @@ Open another terminal to observe Python consumer output:
 
 `docker ps`
 
-Note the container id of the `kafka-consumer-py` container (from the image `python:3`)
+Note the container id of the Python consumer container (from the image `python:3`)
 
 `docker logs <noted-container-id> --follow`
 
