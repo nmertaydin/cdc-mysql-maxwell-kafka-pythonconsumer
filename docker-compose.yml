@@ -50,7 +50,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./py:/home/
-    command: bash -c "pip install kafka-python && python /home/parse-engine.py"
+    command: bash -c "pip install kafka-python && python /home/consume.py"
     depends_on:
       - kafka
     restart: always
