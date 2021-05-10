@@ -2,6 +2,8 @@
 
 This is a PoC I prepared to demonstrate CDC (change data capture).
 
+[Here](https://mert.codes/and-you-could-have-it-all-change-data-capture-with-maxwell-7ec3f0812a7f) is my post about this PoC.
+
 ### The Ingredients
 
 - Source database
@@ -25,11 +27,11 @@ Or to have everything run at the background silently, add -d
 
 `docker-compose up -d`
 
-Open another terminal to observe Python consumer output:
+Open another terminal to observe the Kafka consumer output:
 
 `docker ps`
 
-Note the container id of the Python consumer container (from the image `python:3`)
+Note the container id of the Kafka consumer container (that is spawned using the image `python:3`)
 
 `docker logs <noted-container-id> --follow`
 
